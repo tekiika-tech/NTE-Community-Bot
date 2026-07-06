@@ -52,10 +52,10 @@ async def main():
 
     async with bot:
 
-        # ★ cogsフォルダのping.pyを読み込む
+        # ★ cogsフォルダの/コマンドを読み込む
         await bot.load_extension("cogs.ping")
+        await bot.load_extension("cogs.event")
 
-        # ★ コマンドを同期
 
         await bot.start(TOKEN)
 
