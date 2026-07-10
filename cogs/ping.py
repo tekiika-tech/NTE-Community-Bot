@@ -14,7 +14,7 @@ class Ping(commands.Cog):
     )
     async def ping(self, interaction: discord.Interaction):
 
-        await interaction.response.send_message("Pong!")
+        await interaction.response.send_message("NTE Community Botは正常に動作中です")
 
 
 async def setup(bot):

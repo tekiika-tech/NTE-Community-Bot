@@ -2,55 +2,45 @@
 # 必要な機能を読み込む
 # ======================================
 
-import discord
-from discord.ext import commands
+import sqlite3
 
 # ======================================
-# /event グループ
+# データベース設定
 # ======================================
 
-event = discord.app_commands.Group(
-    name="event",
-    description="イベント管理"
-)
+DATABASE = "database/events.db"
 
 # ======================================
-# Event機能
+# イベントを追加
 # ======================================
 
-class Event(commands.Cog):
+def add_event(
+    title: str,
+    genre: str,
+    start_time: str,
+    end_time: str,
+    description: str
+):
 
-    def __init__(self, bot):
-        self.bot = bot
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
 
-    # -----------------------------
-    # /event create
-    # -----------------------------
-    @event.command(
-        name="create",
-        description="イベントを登録します"
-    )
-    async def create(
-        self,
-        interaction: discord.Interaction
-    ):
-
-        await interaction.response.send_message(
-            "イベント作成モーダルを開きます！（開発中）",
-            ephemeral=True
+    cursor.execute("""
+        INSERT INTO events (
+            title,
+            genre,
+            start_time,
+            end_time,
+            description
         )
+        VALUES (?, ?, ?, ?, ?)
+    """, (
+        title,
+        genre,
+        start_time,
+        end_time,
+        description
+    ))
 
-# ======================================
-# Cogを読み込む
-# ======================================
-
-async def setup(bot):
-
-    cog = Event(bot)
-
-    await bot.add_cog(cog)
-
-    try:
-        bot.tree.add_command(event)
-    except discord.app_commands.CommandAlreadyRegistered:
-        pass
+    conn.commit()
+    conn.close()

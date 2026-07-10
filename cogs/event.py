@@ -60,23 +60,18 @@ class EventCreateModal(discord.ui.Modal, title="イベント作成"):
 
         await interaction.response.send_message(
             "✅ イベントを登録しました！",
-            ephemeral=True
+            ephemeral=False
         )
-
-# ======================================
-# /event グループ
-# ======================================
-
-event = discord.app_commands.Group(
-    name="event",
-    description="イベント管理"
-)
 
 # ======================================
 # Event機能
 # ======================================
 
-class Event(commands.Cog):
+class Event(
+    commands.GroupCog,
+    group_name="event",
+    group_description="イベント管理"
+):
 
     def __init__(self, bot):
         self.bot = bot
@@ -85,7 +80,7 @@ class Event(commands.Cog):
     # /event create
     # -----------------------------
 
-    @event.command(
+    @discord.app_commands.command(
         name="create",
         description="イベントを登録します"
     )
@@ -100,12 +95,7 @@ class Event(commands.Cog):
 # ======================================
 
 async def setup(bot):
-
-    cog = Event(bot)
-
-    await bot.add_cog(cog)
-
-    try:
-        bot.tree.add_command(event)
-    except discord.app_commands.CommandAlreadyRegistered:
-        pass
+    await bot.add_cog(
+        Event(bot),
+        guild=discord.Object(id=1521467066001916084)
+    )

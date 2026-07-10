@@ -3,6 +3,8 @@
 # ======================================
 
 import os
+import asyncio
+
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -15,7 +17,10 @@ load_dotenv()
 
 TOKEN = os.getenv("TOKEN")
 
-# 開発用サーバーID
+# ======================================
+# 開発用サーバー
+# ======================================
+
 GUILD_ID = 1521467066001916084
 
 # ======================================
@@ -42,8 +47,7 @@ async def on_ready():
 
     print(f"{len(synced)}個のコマンドを同期しました！")
     print(f"{bot.user} がオンラインになりました！")
-
-
+    
 # ======================================
 # 起動時の準備
 # ======================================
@@ -52,18 +56,15 @@ async def main():
 
     async with bot:
 
-        # ★ cogsフォルダの/コマンドを読み込む
+        # Cogを読み込む
         await bot.load_extension("cogs.ping")
         await bot.load_extension("cogs.event")
 
-
+        # Bot起動
         await bot.start(TOKEN)
-
 
 # ======================================
 # Bot起動
 # ======================================
-
-import asyncio
 
 asyncio.run(main())
