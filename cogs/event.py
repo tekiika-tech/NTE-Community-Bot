@@ -5,13 +5,17 @@
 import discord
 from discord.ext import commands
 
-from database.database import add_event
+from database.database import add_event, get_events
 
 # ======================================
 # イベント作成モーダル
 # ======================================
 
 class EventCreateModal(discord.ui.Modal, title="イベント作成"):
+
+    # -----------------------------
+    # 入力項目
+    # -----------------------------
 
     event_name = discord.ui.TextInput(
         label="イベント名",
@@ -48,6 +52,10 @@ class EventCreateModal(discord.ui.Modal, title="イベント作成"):
         max_length=1000
     )
 
+    # -----------------------------
+    # モーダル送信
+    # -----------------------------
+
     async def on_submit(self, interaction: discord.Interaction):
 
         add_event(
@@ -59,8 +67,7 @@ class EventCreateModal(discord.ui.Modal, title="イベント作成"):
         )
 
         await interaction.response.send_message(
-            "✅ イベントを登録しました！",
-            ephemeral=False
+            "✅ イベントを登録しました！"
         )
 
 # ======================================
@@ -90,11 +97,54 @@ class Event(
             EventCreateModal()
         )
 
+    # -----------------------------
+    # /event list
+    # -----------------------------
+
+    @discord.app_commands.command(
+        name="list",
+        description="登録済みイベントを表示します"
+    )
+    async def list(self, interaction: discord.Interaction):
+
+        events = get_events()
+
+        if not events:
+
+            await interaction.response.send_message(
+                "📭 登録されているイベントはありません。"
+            )
+
+            return
+
+        embed = discord.Embed(
+            title="📅 登録済みイベント",
+            color=discord.Color.blue()
+        )
+
+        for event in events:
+
+            embed.add_field(
+                name=f"{event[0]}. {event[1]}",
+                value=(
+                    f"**ジャンル**：{event[2]}\n"
+                    f"**開始日時**：{event[3]}\n"
+                    f"**終了日時**：{event[4] or '未設定'}\n"
+                    f"**説明**：{event[5] or 'なし'}"
+                ),
+                inline=False
+            )
+
+        await interaction.response.send_message(
+            embed=embed
+        )
+
 # ======================================
 # Cogを読み込む
 # ======================================
 
 async def setup(bot):
+
     await bot.add_cog(
         Event(bot),
         guild=discord.Object(id=1521467066001916084)

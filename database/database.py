@@ -44,3 +44,30 @@ def add_event(
 
     conn.commit()
     conn.close()
+
+# ======================================
+# イベント一覧を取得
+# ======================================
+
+def get_events():
+
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            id,
+            title,
+            genre,
+            start_time,
+            end_time,
+            description
+        FROM events
+        ORDER BY start_time ASC
+    """)
+
+    events = cursor.fetchall()
+
+    conn.close()
+
+    return events
