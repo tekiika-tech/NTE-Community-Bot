@@ -6,6 +6,15 @@ import discord
 from discord.ext import commands
 
 # ======================================
+# /event グループ
+# ======================================
+
+event = discord.app_commands.Group(
+    name="event",
+    description="イベント機能"
+)
+
+# ======================================
 # Event機能
 # ======================================
 
@@ -14,15 +23,17 @@ class Event(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    # /event コマンド
-    @discord.app_commands.command(
-        name="event",
-        description="イベント機能"
+    @event.command(
+        name="create",
+        description="イベントを作成します"
     )
-    async def event(self, interaction: discord.Interaction):
+    async def create(
+        self,
+        interaction: discord.Interaction
+    ):
 
         await interaction.response.send_message(
-            "イベント機能は現在開発中です！"
+            "イベントを作成します！"
         )
 
 # ======================================
@@ -30,4 +41,9 @@ class Event(commands.Cog):
 # ======================================
 
 async def setup(bot):
-    await bot.add_cog(Event(bot))
+
+    cog = Event(bot)
+
+    await bot.add_cog(cog)
+
+    bot.tree.add_command(event)
