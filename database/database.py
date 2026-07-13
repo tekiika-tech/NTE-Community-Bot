@@ -71,6 +71,33 @@ def get_events():
     conn.close()
 
     return events
+
+# ======================================
+# イベントを1件取得
+# ======================================
+
+def get_event(event_id: int):
+
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            id,
+            title,
+            genre,
+            start_time,
+            end_time,
+            description
+        FROM events
+        WHERE id = ?
+    """, (event_id,))
+
+    event = cursor.fetchone()
+
+    conn.close()
+
+    return event
     
 # ======================================
 # イベントを削除

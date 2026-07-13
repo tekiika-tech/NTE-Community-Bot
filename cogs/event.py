@@ -9,7 +9,7 @@ from database.database import (
     add_event,
     get_events,
     delete_event,
-    get_event
+    get_event,
 )
 
 # ======================================
@@ -157,35 +157,8 @@ class EventDeleteSelect(discord.ui.Select):
         delete_event(event_id)
 
         await interaction.response.send_message(
-        f   "✅ **{event[1]}** を削除しました。"
+            f"✅ **{event[1]}** を削除しました。"
         )
-
-# ======================================
-# イベントを1件取得
-# ======================================
-
-def get_event(event_id: int):
-
-    conn = sqlite3.connect(DATABASE)
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        SELECT
-            id,
-            title,
-            genre,
-            start_time,
-            end_time,
-            description
-        FROM events
-        WHERE id = ?
-    """, (event_id,))
-
-    event = cursor.fetchone()
-
-    conn.close()
-
-    return event
 
 # ======================================
 # イベント削除View
