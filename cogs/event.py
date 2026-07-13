@@ -5,7 +5,12 @@
 import discord
 from discord.ext import commands
 
-from database.database import add_event, get_events
+from database.database import (
+    add_event,
+    get_events,
+    delete_event,
+    get_event
+)
 
 # ======================================
 # イベント作成モーダル
@@ -97,6 +102,105 @@ class Event(
             EventCreateModal()
         )
 
+# ======================================
+# イベント削除プルダウン
+# ======================================
+
+class EventDeleteSelect(discord.ui.Select):
+
+    def __init__(self):
+
+        events = get_events()
+
+        options = []
+
+        for event in events:
+
+            options.append(
+                discord.SelectOption(
+                    label=event[1],
+                    description=event[3],
+                    value=str(event[0])
+                )
+            )
+
+        if not options:
+
+            options.append(
+                discord.SelectOption(
+                    label="イベントがありません",
+                    value="0"
+                )
+            )
+
+        super().__init__(
+            placeholder="削除するイベントを選択してください",
+            min_values=1,
+            max_values=1,
+            options=options
+        )
+
+    async def callback(self, interaction: discord.Interaction):
+
+        if self.values[0] == "0":
+
+            await interaction.response.send_message(
+                "削除できるイベントがありません。"
+            )
+
+            return
+
+        event_id = int(self.values[0])
+
+        event = get_event(event_id)
+
+        delete_event(event_id)
+
+        await interaction.response.send_message(
+        f   "✅ **{event[1]}** を削除しました。"
+        )
+
+# ======================================
+# イベントを1件取得
+# ======================================
+
+def get_event(event_id: int):
+
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            id,
+            title,
+            genre,
+            start_time,
+            end_time,
+            description
+        FROM events
+        WHERE id = ?
+    """, (event_id,))
+
+    event = cursor.fetchone()
+
+    conn.close()
+
+    return event
+
+# ======================================
+# イベント削除View
+# ======================================
+
+class EventDeleteView(discord.ui.View):
+
+    def __init__(self):
+
+        super().__init__()
+
+        self.add_item(
+            EventDeleteSelect()
+        )
+
     # -----------------------------
     # /event list
     # -----------------------------
@@ -137,6 +241,21 @@ class Event(
 
         await interaction.response.send_message(
             embed=embed
+        )
+
+    # -----------------------------
+    # /event delete
+    # -----------------------------
+
+    @discord.app_commands.command(
+        name="delete",
+        description="イベントを削除します"
+    )
+    async def delete(self, interaction: discord.Interaction):
+
+        await interaction.response.send_message(
+            "削除するイベントを選択してください。",
+            view=EventDeleteView()
         )
 
 # ======================================

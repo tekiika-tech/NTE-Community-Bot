@@ -71,3 +71,20 @@ def get_events():
     conn.close()
 
     return events
+    
+# ======================================
+# イベントを削除
+# ======================================
+
+def delete_event(event_id: int):
+
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "DELETE FROM events WHERE id = ?",
+        (event_id,)
+    )
+
+    conn.commit()
+    conn.close()
