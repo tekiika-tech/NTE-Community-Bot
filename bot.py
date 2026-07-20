@@ -1,31 +1,16 @@
-# ======================================
-# 必要な機能を読み込む
-# ======================================
-
-import os
 import asyncio
+import os
 
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
-# ======================================
-# .envを読み込む
-# ======================================
+from database.init_db import init_database
 
 load_dotenv()
 
 TOKEN = os.getenv("TOKEN")
-
-# ======================================
-# 開発用サーバー
-# ======================================
-
-GUILD_ID = 1521467066001916084
-
-# ======================================
-# Bot設定
-# ======================================
+GUILD_ID = int(os.getenv("GUILD_ID"))
 
 intents = discord.Intents.default()
 
@@ -34,37 +19,30 @@ bot = commands.Bot(
     intents=intents
 )
 
-# ======================================
-# Bot起動時
-# ======================================
 
 @bot.event
 async def on_ready():
 
     guild = discord.Object(id=GUILD_ID)
 
-    synced = await bot.tree.sync(guild=guild)
+    synced = await bot.tree.sync(
+        guild=guild
+    )
 
     print(f"{len(synced)}個のコマンドを同期しました！")
     print(f"{bot.user} がオンラインになりました！")
-    
-# ======================================
-# 起動時の準備
-# ======================================
+
 
 async def main():
 
+    init_database()
+
     async with bot:
 
-        # Cogを読み込む
         await bot.load_extension("cogs.ping")
         await bot.load_extension("cogs.event")
 
-        # Bot起動
         await bot.start(TOKEN)
 
-# ======================================
-# Bot起動
-# ======================================
 
 asyncio.run(main())

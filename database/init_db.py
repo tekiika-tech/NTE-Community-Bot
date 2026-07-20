@@ -5,37 +5,46 @@
 import sqlite3
 
 # ======================================
-# データベースへ接続
+# データベース設定
 # ======================================
 
-conn = sqlite3.connect("database/events.db")
-cursor = conn.cursor()
+DATABASE = "database/events.db"
 
 # ======================================
-# eventsテーブルを作成
+# データベース初期化
 # ======================================
 
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS events (
+def init_database():
 
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
 
-    title TEXT NOT NULL,
-    genre TEXT NOT NULL,
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS events (
 
-    start_time TEXT NOT NULL,
-    end_time TEXT,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-    description TEXT
+            title TEXT NOT NULL,
 
-)
-""")
+            genre TEXT NOT NULL,
+
+            start_time TEXT NOT NULL,
+
+            end_time TEXT,
+
+            description TEXT
+        )
+    """)
+
+    conn.commit()
+    conn.close()
 
 # ======================================
-# 保存して終了
+# メイン処理
 # ======================================
 
-conn.commit()
-conn.close()
+if __name__ == "__main__":
 
-print("データベースを作成しました！")
+    init_database()
+
+    print("データベースを作成しました！")
